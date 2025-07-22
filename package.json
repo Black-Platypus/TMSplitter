@@ -1,0 +1,19 @@
+{
+  "name": "tmsplitter",
+  "version": "1.0.0",
+  "main": "splitTMExport.js",
+  "scripts": {
+    "test": "node ${main}",
+    "start": "node ${main}"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^10.3.2"
+  },
+  "dependencies": {
+    "tmsplitter": "file:"
+  }
+}
