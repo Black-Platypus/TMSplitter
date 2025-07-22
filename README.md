@@ -15,7 +15,8 @@ Using this, I found that I could get up to about 60MB before it failed, but I ex
 - If a single script exceeds the maximum size, offers to drop either the script's included "requires", "storage", or both, if that would make it fit.
 - See the output for conflicting files
 
-<img width="818" height="428" alt="image" src="https://github.com/user-attachments/assets/b8d5c256-cc7b-4074-affb-6ba4ff333497" />
+<img width="818" height="428" alt="image" src="https://github.com/user-attachments/assets/b8d5c256-cc7b-4074-affb-6ba4ff333497" />  
+
 (This example is forced with a low max length, to quickly find a script to showcase this. In reality, the maximum allowed size should be much larger)
 
 ## Usage
