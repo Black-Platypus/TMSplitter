@@ -1,2 +1,2 @@
-node "%~dp0splitTMExport.cjs" %*
+call node "%~dp0splitTMExport.cjs" %*
 pause
