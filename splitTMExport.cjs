@@ -1,14 +1,16 @@
 const fs = require('fs');
-const util = require('util');
 const path = require('path');
 const readline = require('readline');
 
-const srcFile = "F:/Downloads/tampermonkey-backup-chrome-2025-07-13T14-08-43-710Z.txt";
+let srcFile = "F:/Downloads/tampermonkey-backup-chrome-2025-07-13T14-08-43-710Z.txt"; // Set here or drop a file on the .cmd (Windows), which overrides this value
+if(process.argv.length>2)
+	srcFile = process.argv[2]
+
 const outDir = "${srcPathNoExt}-${maxLength}"; // Supports: literal path | srcPathNoExt = Path and basename of source file | / = path separator | maxLength = maxPartLength
 const outFileBase = "${srcFileNoExt}-${n}"; // Supports: literal string | srcFileNoExt = basename of source file | n = number in sequence
 const alwaysIncludeSettings = false; // include exported settings in every chunk
-const maxScriptsPerPart = 50;
-const maxPartLength = 20*1024*1024;
+const maxPartLength = 50*1024*1024; // Max approximate file size
+const maxScriptsPerPart = 200; // only for convenience
 
 const stringValues = {
 	"/": path.sep,
@@ -17,7 +19,7 @@ const stringValues = {
 	maxLength: formatBytes(maxPartLength, 1, false)
 };
 stringValues.srcFileNoExt = stringValues.srcFile.replace(/\.[^\.]+$/, "");
-// console.log(stringValues.srcFileNoExt);
+// log(stringValues.srcFileNoExt);
 stringValues.srcPathNoExt = path.join(stringValues.srcPath, stringValues.srcFileNoExt);
 
 const _outDir = replaceValues(outDir);
@@ -28,7 +30,7 @@ function replaceValues(str){
 	while(replaced){
 		replaced = false;
 		for(let k in stringValues){
-			// console.log(k);
+			// log(k);
 			str = str.replace("${"+k+"}", ()=>{
 				replaced = true;
 				return stringValues[k];
@@ -40,7 +42,7 @@ function replaceValues(str){
 
 const allStr = fs.readFileSync(srcFile);
 const data = JSON.parse(allStr);
-// console.log(Buffer.byteLength(JSON.stringify(data)), Buffer.byteLength(allStr));
+// log(Buffer.byteLength(JSON.stringify(data)), Buffer.byteLength(allStr));
 
 const baseObj = {created_by: data.created_by, version: data.version};
 
@@ -78,7 +80,7 @@ async function main(){
 		let obj = Object.assign({scripts: []}, baseObj);
 		if(ix==0 || alwaysIncludeSettings)
 			obj.settings = data.settings;
-		// console.log(obj);
+		// log(obj);
 		let len = JSON.stringify(obj).length;
 		// status(scriptIx, len, ix);
 		if(len>=maxPartLength){
@@ -148,9 +150,17 @@ async function main(){
 	}
 	const chunks = toWrite.length;
 	log("Got data:", chunks, "chunks");
+	if(! await confirm("Write " + chunks + " files to '" + _outDir + "'?"))
+		return;
 	const digits = Math.floor(Math.log10(chunks) + 1);
 	let c = 1;
-	fs.mkdirSync(_outDir, {recursive: true});
+	try{
+		fs.mkdirSync(_outDir, {recursive: true});
+	}
+	catch(e){
+		console.error("Error creating directory '" + fileName + "':");
+		return console.error(e);
+	}
 	log("Writing to:", _outDir);
 	for(let chunk of toWrite){
 		let fileName = outPathBase.replace("${n}", ("000" + c).slice(-digits)) + ".txt";
@@ -182,14 +192,14 @@ function formatBytes(int, digits=2, fixed=true){
 }
 
 function status(scriptIx, len, ix, ...rest){
-	console.log(`[${scriptIx+1}/${scriptsTotal}][${ix+1}] ~${formatBytes(len)} (~${formatBytes(lengthTotal)} total)`, ...rest);
+	log(`[${scriptIx+1}/${scriptsTotal}][${ix+1}] ~${formatBytes(len)} (~${formatBytes(lengthTotal)} total)`, ...rest);
 }
 function details(script){
 	let sizes = {};
 	for(let k in script){
 		sizes[k] = {length: formatBytes(JSON.stringify(script[k]).length)};
 	}
-	console.log(script.name, "(" + script.uuid + ")");
+	log(script.name, "(" + script.uuid + ")");
 	console.table(sizes);
 }
 
