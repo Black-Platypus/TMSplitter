@@ -203,7 +203,7 @@ function details(script){
 	for(let k in script){
 		sizes[k] = {length: formatBytes(JSON.stringify(script[k]).length)};
 	}
-	log(script.name, "(" + script.uuid + ")");
+	log("\t" + script.name, "(" + script.uuid + ")");
 	console.table(sizes);
 }
 
