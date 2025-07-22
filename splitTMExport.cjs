@@ -1,16 +1,18 @@
+// https://github.com/Black-Platypus/TMSplitter/
+
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
 
-let srcFile = "F:/Downloads/tampermonkey-backup-chrome-2025-07-13T14-08-43-710Z.txt"; // Set here or drop a file on the .cmd (Windows), which overrides this value
-if(process.argv.length>2)
-	srcFile = process.argv[2]
-
-const outDir = "${srcPathNoExt}-${maxLength}"; // Supports: literal path | srcPathNoExt = Path and basename of source file | / = path separator | maxLength = maxPartLength
-const outFileBase = "${srcFileNoExt}-${n}"; // Supports: literal string | srcFileNoExt = basename of source file | n = number in sequence
+let srcFile = "F:/Downloads/tampermonkey-backup-chrome-2025-07-13T14-08-43-710Z.txt"; // Set here or [call the script with a file path as an argument or drop a file on the .cmd (Windows)], which overrides this value
+const outDir = "${srcPathNoExt}-${maxLength}"; // Supports: literal path | srcPathNoExt = Path and basename of source file | / = path separator | maxLength = maxPartLength ...
+const outFileBase = "${srcFileNoExt}-${n}"; // Supports: literal string | srcFileNoExt = basename of source file | n = number in sequence ...
 const alwaysIncludeSettings = false; // include exported settings in every chunk
 const maxPartLength = 50*1024*1024; // Max approximate file size
 const maxScriptsPerPart = 200; // only for convenience
+
+if(process.argv.length>2)
+	srcFile = process.argv[2]
 
 const stringValues = {
 	"/": path.sep,
@@ -19,7 +21,6 @@ const stringValues = {
 	maxLength: formatBytes(maxPartLength, 1, false)
 };
 stringValues.srcFileNoExt = stringValues.srcFile.replace(/\.[^\.]+$/, "");
-// log(stringValues.srcFileNoExt);
 stringValues.srcPathNoExt = path.join(stringValues.srcPath, stringValues.srcFileNoExt);
 
 const _outDir = replaceValues(outDir);
@@ -56,7 +57,7 @@ let ix = 0;
 let scriptIx = 0;
 let scriptsTotal = data.scripts.length;
 let lengthTotal = 0;
-const safetyMax = 100;
+const safetyMax = 100; // To prevent possible infinite loops if something goes wrong, loop a maximum of safetyMax times
 function confirm(prompt){
 	return new Promise(function(resolve, reject){
 		rl.question(prompt + " [Y/n] ", async function(answer){
@@ -148,10 +149,13 @@ async function main(){
 		ix++;
 		// break;
 	}
+	
 	const chunks = toWrite.length;
 	log("Got data:", chunks, "chunks");
+	
 	if(! await confirm("Write " + chunks + " files to '" + _outDir + "'?"))
 		return;
+	
 	const digits = Math.floor(Math.log10(chunks) + 1);
 	let c = 1;
 	try{
