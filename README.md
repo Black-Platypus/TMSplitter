@@ -23,8 +23,8 @@ Using this, I found that I could get up to about 60MB before it failed, but I ex
 - This is a Node.js project: If not yet present, [install it first](https://nodejs.org/en/download); you may have to restart your machine.
 - Ideally, make sure that the path to the node executable is in your system's [PATH environment variable](https://www3.ntu.edu.sg/home/ehchua/programming/howto/Environment_Variables.html)
   - Alternatively, call the script with a direct path to it (see below)
-- Download or clone this repository
-- Windows: This comes with a .cmd launcher. You can drag/drop a TM export file (.txt/json) onto it, and it should ingest it.
+- Download or clone this repository (Or just [splitTMExport.cjs](https://github.com/Black-Platypus/TMSplitter/blob/main/splitTMExport.cjs) by itself)
+- _Windows_: This comes with a .cmd launcher. You can drag/drop a TM export file (.txt/json) onto it, and it should ingest it.
   - if the system can't find the node executable, you can edit the .cmd file's content:
   - ~~`node "%~dp0splitTMExport.cjs" %*`~~ to `"<path-to-executable>" "%~dp0splitTMExport.cjs" %*` (You may need the quotes)
 - In general: You can call the script with node in the terminal of your choice, like `node splitTMExport.cjs "<path-to-exported-file>"`
